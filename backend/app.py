@@ -2,7 +2,9 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+
 from config.db import test_connection, db
+from routes.auth_routes import auth_bp
 
 import os
 
@@ -20,6 +22,9 @@ app.config["SECRET_KEY"] = os.getenv("JWT_SECRET")
 
 # Maximum upload size: 20 MB
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
+
+# Register authentication routes
+app.register_blueprint(auth_bp)
 
 
 # Home route
@@ -52,6 +57,9 @@ def health_check():
 
 # Start application
 if __name__ == "__main__":
+
+    if not app.config["SECRET_KEY"]:
+        raise RuntimeError("JWT_SECRET is missing from the .env file.")
 
     if test_connection():
         print("Starting Cybercrime Digital Evidence Management System...")
